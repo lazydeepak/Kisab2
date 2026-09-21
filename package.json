@@ -1,0 +1,12 @@
+{
+  "name": "kisab-applet",
+  "private": true,
+  "scripts": {
+    "build": "cd site && node build.js",
+    "dev": "npm run build && node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "serve": "^14.2.4"
+  }
+}

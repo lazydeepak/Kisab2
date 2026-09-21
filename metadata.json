@@ -1,0 +1,6 @@
+{
+  "name": "Kisab Farm Ledger",
+  "description": "Kisab is a standalone offline-first Android farm ledger app built on the shared Susankhya foundation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
