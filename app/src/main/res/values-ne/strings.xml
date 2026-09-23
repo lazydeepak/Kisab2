@@ -842,4 +842,11 @@
     <string name="notification_channel_reminders_name">सम्झनाहरू</string>
     <string name="notification_channel_reminders_description">ब्याकअप र अन्य गैर-जरुरी सञ्चालन सम्झनाहरू।</string>
 
+    <string name="settings_account_google_sign_in_action">गुगलबाट साइन इन</string>
+    <string name="google_drive_sync_action">गुगल ड्राइभमा सिंक गर्नुहोस्</string>
+    <string name="google_drive_restore_action">गुगल ड्राइभबाट रिस्टोर गर्नुहोस्</string>
+    <string name="toast_google_drive_synced">गुगल ड्राइभमा सिंक भयो।</string>
+    <string name="toast_google_drive_restored">गुगल ड्राइभबाट रिस्टोर भयो।</string>
+    <string name="toast_google_signed_in">गुगलबाट साइन इन भयो।</string>
+
 </resources>

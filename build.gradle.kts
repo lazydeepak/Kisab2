@@ -15,12 +15,19 @@ subprojects {
     repositories {
         google()
         mavenCentral()
+        mavenLocal()
         maven {
-            name = "githubPackagesFoundation"
-            url = uri("https://maven.pkg.github.com/lazydeepak/susankhya-app-foundation")
-            credentials {
-                username = githubActor
-                password = githubToken
+            name = "localEmbeddedRepo"
+            url = uri(rootProject.file("local-repo"))
+        }
+        if (githubToken.isNotBlank()) {
+            maven {
+                name = "githubPackagesFoundation"
+                url = uri("https://maven.pkg.github.com/lazydeepak/susankhya-app-foundation")
+                credentials {
+                    username = githubActor
+                    password = githubToken
+                }
             }
         }
     }
