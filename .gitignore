@@ -1,7 +1,6 @@
 .gradle/
 .kotlin/
 build/
-node_modules/
 
 # macOS Finder metadata
 .DS_Store

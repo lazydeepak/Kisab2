@@ -36,7 +36,6 @@ enum class FarmUiError(@param:StringRes val resourceId: Int) {
     BACKUP_INVALID_OR_UNSUPPORTED(R.string.error_backup_invalid_or_unsupported),
     BACKUP_TOO_LARGE_OR_UNREADABLE(R.string.error_backup_too_large_or_unreadable),
     CURRENT_FARM_MISSING(R.string.error_current_farm_missing),
-    PRODUCT_NAME_EXISTS(R.string.quick_sale_product_name_exists),
     UNEXPECTED(R.string.error_unexpected);
 
     companion object {

@@ -56,11 +56,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.susankhya.kisab.BuildConfig
-import com.susankhya.kisab.account.AuthProvider
-import com.susankhya.kisab.account.ProviderCredential
-import com.susankhya.kisab.persistence.GoogleDriveSyncService
-import com.susankhya.kisab.session.KisabSessionStorageAdapter
-import com.susankhya.kisab.KisabSessionApp
 import com.susankhya.kisab.R
 import com.susankhya.kisab.domain.FarmActivityCatalog
 import com.susankhya.kisab.domain.FarmActivityType
@@ -122,6 +117,7 @@ import com.susankhya.kisab.persistence.SharedPreferencesAppAppearancePreferences
 import com.susankhya.kisab.persistence.SharedPreferencesAppTextSizePreferences
 import com.susankhya.kisab.persistence.SharedPreferencesBackupFreshnessStore
 import com.susankhya.kisab.persistence.SharedPreferencesFarmStore
+import com.susankhya.kisab.KisabSessionApp
 import com.susankhya.kisab.account.AccountApi
 import com.susankhya.kisab.account.EmailOtpFlow
 import com.susankhya.kisab.account.EmailOtpFlowError
@@ -148,6 +144,7 @@ import com.susankhya.kisab.persistence.SharedPreferencesPrivateBuildWarningStore
 import com.susankhya.kisab.release.PrivateBuildAccessStage
 import com.susankhya.kisab.release.PrivateBuildExpiryGate
 import com.susankhya.kisab.release.PrivateBuildExpirySnapshot
+import com.susankhya.kisab.session.KisabSessionStorageAdapter
 import com.susankhya.kisab.persistence.SharedPreferencesLocalUserStore
 import com.susankhya.kisab.update.ApkDownloader
 import com.susankhya.kisab.update.ApkInstaller
@@ -414,11 +411,6 @@ class FarmActivity : AppCompatActivity() {
     private lateinit var settingsAccountStatusDetail: TextView
     private lateinit var settingsAccountSignInRequiredText: TextView
     private lateinit var settingsAccountEmailSignInButton: Button
-    private lateinit var settingsGoogleSignInButton: Button
-    private lateinit var settingsGoogleDriveSyncButton: Button
-    private lateinit var settingsGoogleDriveRestoreButton: Button
-    private val googleDriveSyncService = GoogleDriveSyncService()
-    private lateinit var sessionAdapter: KisabSessionStorageAdapter
     private lateinit var settingsNotificationsSection: TextView
     private lateinit var settingsNotificationsStatusText: TextView
     private lateinit var settingsNotificationsExplanationText: TextView
@@ -623,10 +615,9 @@ class FarmActivity : AppCompatActivity() {
         localUserService.migrateExistingInstall(service.currentFarmId())
         accountLinkService = AccountLinkService(SharedPreferencesAccountLinkStore(applicationContext))
         val accountApi: AccountApi = if (BuildConfig.DEBUG) FakeAccountApi.demo() else UnavailableAccountApi
-        sessionAdapter = KisabSessionStorageAdapter(KisabSessionApp().storage(applicationContext))
         onlineAccountService = OnlineAccountService(
             accountApi,
-            sessionAdapter,
+            KisabSessionStorageAdapter(KisabSessionApp().storage(applicationContext)),
             accountLinkService
         )
         emailOtpFlow = EmailOtpFlow(accountApi)
@@ -1061,12 +1052,6 @@ class FarmActivity : AppCompatActivity() {
         settingsAccountSignInRequiredText = findViewById(R.id.settingsAccountSignInRequiredText)
         settingsAccountEmailSignInButton = findViewById(R.id.settingsAccountEmailSignInButton)
         settingsAccountEmailSignInButton.setOnClickListener { showEmailSignInDialog() }
-        settingsGoogleSignInButton = findViewById(R.id.settingsGoogleSignInButton)
-        settingsGoogleSignInButton.setOnClickListener { showGoogleSignInDialog() }
-        settingsGoogleDriveSyncButton = findViewById(R.id.settingsGoogleDriveSyncButton)
-        settingsGoogleDriveSyncButton.setOnClickListener { performGoogleDriveSync() }
-        settingsGoogleDriveRestoreButton = findViewById(R.id.settingsGoogleDriveRestoreButton)
-        settingsGoogleDriveRestoreButton.setOnClickListener { performGoogleDriveRestore() }
         settingsNotificationsSection = findViewById(R.id.settingsNotificationsSection)
         settingsNotificationsStatusText = findViewById(R.id.settingsNotificationsStatusText)
         settingsNotificationsExplanationText = findViewById(R.id.settingsNotificationsExplanationText)
@@ -2143,25 +2128,18 @@ class FarmActivity : AppCompatActivity() {
     }
 
     private fun updateShellTitle() {
-        val showSwitcher = currentDestination in setOf(
-            Destination.TODAY,
-            Destination.KHATA,
-            Destination.FARM_WORK,
-            Destination.MORE,
-            Destination.HISAB,
-            Destination.FARM_DETAILS
-        )
+        val isToday = currentDestination == Destination.TODAY
         val hasFarm = currentFarmId != null
-        shellFarmSwitchIcon.visibility = if (showSwitcher && hasFarm) View.VISIBLE else View.GONE
-        shellFarmSwitchIcon.isClickable = showSwitcher && hasFarm
-        shellFarmSwitchIcon.isFocusable = showSwitcher && hasFarm
-        shellTitle.isClickable = showSwitcher && hasFarm
-        shellTitle.isFocusable = showSwitcher && hasFarm
+        shellFarmSwitchIcon.visibility = if (isToday && hasFarm) View.VISIBLE else View.GONE
+        shellFarmSwitchIcon.isClickable = isToday && hasFarm
+        shellFarmSwitchIcon.isFocusable = isToday && hasFarm
+        shellTitle.isClickable = isToday && hasFarm
+        shellTitle.isFocusable = isToday && hasFarm
 
         shellTitle.text = when (currentDestination) {
             Destination.TODAY -> {
                 val farm = currentFarmId?.let { service.loadFarm(it) }
-                farm?.name ?: string(R.string.nav_today)
+                farm?.name ?: string(R.string.app_name)
             }
             Destination.KHATA -> string(R.string.nav_khata)
             Destination.FARM_WORK -> string(R.string.nav_farm_work)
@@ -4528,17 +4506,8 @@ class FarmActivity : AppCompatActivity() {
                     card.addView(allocView)
                 }
 
-                // Production reconciliation status
-                if (reconciliation.unitMismatch) {
-                    val mismatchView = TextView(this).apply {
-                        text = string(R.string.farm_work_unit_mismatch)
-                        textSize = 13f
-                        setTextColor(getColor(R.color.payableText))
-                        setTypeface(typeface, android.graphics.Typeface.BOLD)
-                        setPadding(0, dp(6), 0, 0)
-                    }
-                    card.addView(mismatchView)
-                } else if (reconciliation.unexplained > BigDecimal.ZERO) {
+                // Unexplained production status
+                if (reconciliation.unexplained > BigDecimal.ZERO) {
                     val unexplainedTile = LinearLayout(this).apply {
                         orientation = LinearLayout.HORIZONTAL
                         background = ContextCompat.getDrawable(this@FarmActivity, R.drawable.bg_metric_tile)
@@ -4566,15 +4535,6 @@ class FarmActivity : AppCompatActivity() {
                     unexplainedTile.addView(warnText)
                     unexplainedTile.addView(reconcileBtn)
                     card.addView(unexplainedTile)
-                } else if (reconciliation.isInconsistent) {
-                    val overAllocatedView = TextView(this).apply {
-                        text = string(R.string.farm_work_over_allocated_label, "${formatQuantity(reconciliation.unexplained.abs())} $unitLabel")
-                        textSize = 13f
-                        setTextColor(getColor(R.color.payableText))
-                        setTypeface(typeface, android.graphics.Typeface.BOLD)
-                        setPadding(0, dp(6), 0, 0)
-                    }
-                    card.addView(overAllocatedView)
                 } else if (reconciliation.produced > BigDecimal.ZERO) {
                     val explainedView = TextView(this).apply {
                         text = string(R.string.farm_work_all_explained)
@@ -4976,14 +4936,8 @@ class FarmActivity : AppCompatActivity() {
                     dialog.dismiss()
                     showToast(R.string.quick_sale_product_added)
                     afterSave()
-                } catch (exception: IllegalArgumentException) {
-                    if (exception.message?.contains("already exists", ignoreCase = true) == true) {
-                        showEditorError(FarmUiError.PRODUCT_NAME_EXISTS, nameInput)
-                    } else {
-                        showValidationMessage(FarmUiError.UNEXPECTED.resourceId)
-                    }
                 } catch (exception: Exception) {
-                    showValidationMessage(FarmUiError.UNEXPECTED.resourceId)
+                    Toast.makeText(this, exception.message ?: string(R.string.error_unexpected), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -6075,130 +6029,10 @@ class FarmActivity : AppCompatActivity() {
         }
         settingsAccountEmailSignInButton.visibility =
             if (ui.status == AccountConnectionStatus.LOCAL_ONLY) View.VISIBLE else View.GONE
-        settingsGoogleSignInButton.visibility =
-            if (ui.status == AccountConnectionStatus.LOCAL_ONLY) View.VISIBLE else View.GONE
-        settingsGoogleDriveSyncButton.visibility =
-            if (ui.status == AccountConnectionStatus.CONNECTED) View.VISIBLE else View.GONE
-        settingsGoogleDriveRestoreButton.visibility =
-            if (ui.status == AccountConnectionStatus.CONNECTED) View.VISIBLE else View.GONE
         settingsAccountSignInRequiredText.visibility =
             if (ui.showSignInRequired) View.VISIBLE else View.GONE
         if (ui.showSignInRequired) {
             settingsAccountSignInRequiredText.text = string(R.string.settings_account_sign_in_required)
-        }
-    }
-
-    // --- Google Account & Drive Integration --------------------------------
-
-    private fun showGoogleSignInDialog() {
-        val emailInput = EditText(this).apply {
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
-            hint = string(R.string.email_input_hint)
-            setPadding(dp(20), 0, dp(20), 0)
-        }
-        val container = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(20), dp(8), dp(20), 0)
-            addView(emailInput)
-        }
-        val dialog = AlertDialog.Builder(this)
-            .setTitle(string(R.string.settings_account_google_sign_in_action))
-            .setView(container)
-            .setPositiveButton(string(R.string.action_ok), null)
-            .setNegativeButton(string(R.string.action_cancel), null)
-            .create()
-
-        dialog.setOnShowListener {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                val email = emailInput.text.toString().trim()
-                if (email.isEmpty()) {
-                    showToast(R.string.account_error_invalid_email)
-                } else {
-                    dialog.dismiss()
-                    establishGoogleAccount(email)
-                }
-            }
-        }
-        dialog.show()
-    }
-
-    private fun establishGoogleAccount(email: String) {
-        lifecycleScope.launch {
-            val result = withContext(Dispatchers.IO) {
-                onlineAccountService.establish(
-                    localUserId = localUserService.currentUser()?.userId
-                        ?: localUserService.ensureLocalUser().userId,
-                    credential = ProviderCredential(AuthProvider.GOOGLE, "google-assertion-$email")
-                )
-            }
-            when (result) {
-                is OnlineAccountResult.Success -> {
-                    renderAccountSettingsSection()
-                    showToast(R.string.toast_google_signed_in)
-                }
-                is OnlineAccountResult.Failure -> {
-                    showToast(R.string.account_error_unavailable)
-                }
-            }
-        }
-    }
-
-    private fun performGoogleDriveSync() {
-        lifecycleScope.launch {
-            val session = withContext(Dispatchers.IO) { sessionAdapter.read() }
-            val accessToken = session?.accessToken
-            if (accessToken.isNullOrBlank()) {
-                showToast(R.string.settings_account_sign_in_required)
-                return@launch
-            }
-            val farmId = service.currentFarmId()
-            if (farmId == null) {
-                showToast(R.string.error_current_farm_missing)
-                return@launch
-            }
-            val farm = service.loadFarm(farmId)
-            if (farm == null) {
-                showToast(R.string.error_current_farm_missing)
-                return@launch
-            }
-            val syncResult = withContext(Dispatchers.IO) {
-                try {
-                    googleDriveSyncService.syncToDrive(accessToken, farm)
-                    true
-                } catch (e: Exception) {
-                    false
-                }
-            }
-            if (syncResult) {
-                showToast(R.string.toast_google_drive_synced)
-            } else {
-                showToast(R.string.error_unexpected)
-            }
-        }
-    }
-
-    private fun performGoogleDriveRestore() {
-        lifecycleScope.launch {
-            val session = withContext(Dispatchers.IO) { sessionAdapter.read() }
-            val accessToken = session?.accessToken
-            if (accessToken.isNullOrBlank()) {
-                showToast(R.string.settings_account_sign_in_required)
-                return@launch
-            }
-            val backupContent = withContext(Dispatchers.IO) {
-                try {
-                    val farm = googleDriveSyncService.restoreFromDrive(accessToken)
-                    FarmBackupCodec.encode(farm)
-                } catch (e: Exception) {
-                    null
-                }
-            }
-            if (backupContent != null) {
-                handleImportedBackupContent(backupContent)
-                showToast(R.string.toast_google_drive_restored)
-            } else {
-                showToast(R.string.error_backup_invalid_or_unsupported)
-            }
         }
     }
 

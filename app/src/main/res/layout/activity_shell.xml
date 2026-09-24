@@ -1939,45 +1939,6 @@
                     android:text="@string/settings_account_sign_in_action"
                     android:visibility="gone" />
 
-                <Button
-                    android:id="@+id/settingsGoogleSignInButton"
-                    style="@style/Widget.AppCompat.Button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:minHeight="48dp"
-                    android:minWidth="180dp"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:text="@string/settings_account_google_sign_in_action"
-                    android:visibility="gone" />
-
-                <Button
-                    android:id="@+id/settingsGoogleDriveSyncButton"
-                    style="@style/Widget.AppCompat.Button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:minHeight="48dp"
-                    android:minWidth="180dp"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:text="@string/google_drive_sync_action"
-                    android:visibility="gone" />
-
-                <Button
-                    android:id="@+id/settingsGoogleDriveRestoreButton"
-                    style="@style/Widget.AppCompat.Button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:minHeight="48dp"
-                    android:minWidth="180dp"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:text="@string/google_drive_restore_action"
-                    android:visibility="gone" />
-
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

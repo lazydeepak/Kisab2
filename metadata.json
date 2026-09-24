@@ -1,6 +1,8 @@
 {
-  "name": "Kisab Farm Ledger",
-  "description": "Kisab is a standalone offline-first Android farm ledger app built on the shared Susankhya foundation.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "name": "Kisab",
+  "description": "Kisab is a simple, offline farm ledger app for farmers to record sales, purchases, khata, production, and farm work in Nepali and English.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

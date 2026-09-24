@@ -1,9 +1,21 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
-const PORT = 3000;
-const PUBLIC_DIR = path.join(__dirname, 'dist', 'web');
+const PORT = parseInt(process.env.DEFAULT_APP_PORT || '3000', 10);
+const APP_DIR = __dirname;
+const DIST_DIR = path.join(APP_DIR, 'dist', 'web');
+
+// Ensure site is built
+try {
+  if (!fs.existsSync(path.join(DIST_DIR, 'index.html'))) {
+    console.log('[DevServer] Building static web pages...');
+    execSync('node site/build.js', { cwd: APP_DIR, stdio: 'inherit' });
+  }
+} catch (err) {
+  console.error('[DevServer] Build error:', err);
+}
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -13,67 +25,56 @@ const MIME_TYPES = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
-  '.gif': 'image/gif',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon',
-  '.txt': 'text/plain; charset=utf-8',
-  '.xml': 'application/xml; charset=utf-8',
-  '.webp': 'image/webp'
+  '.webp': 'image/webp',
+  '.xml': 'application/xml',
+  '.txt': 'text/plain; charset=utf-8'
 };
 
 const server = http.createServer((req, res) => {
-  // Only accept GET and HEAD
-  if (req.method !== 'GET' && req.method !== 'HEAD') {
-    res.statusCode = 405;
-    res.end('Method Not Allowed');
+  const urlPath = req.url.split('?')[0];
+
+  if (urlPath === '/api/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'ok', service: 'kisab-dev-server' }));
     return;
   }
 
-  const urlPath = decodeURIComponent(req.url.split('?')[0]);
-  let filePath = path.join(PUBLIC_DIR, urlPath);
+  let filePath = path.join(DIST_DIR, urlPath);
 
-  // Prevent directory traversal attacks
-  if (!filePath.startsWith(PUBLIC_DIR)) {
-    res.statusCode = 403;
+  // Normalize path security
+  if (!filePath.startsWith(DIST_DIR)) {
+    res.writeHead(403);
     res.end('Forbidden');
     return;
   }
 
-  fs.stat(filePath, (err, stats) => {
-    if (!err && stats.isDirectory()) {
-      filePath = path.join(filePath, 'index.html');
+  // Handle directory or clean URLs
+  if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
+    filePath = path.join(filePath, 'index.html');
+  } else if (!fs.existsSync(filePath) && fs.existsSync(filePath + '.html')) {
+    filePath = filePath + '.html';
+  }
+
+  if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+    const ext = path.extname(filePath).toLowerCase();
+    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+    res.writeHead(200, { 'Content-Type': contentType });
+    fs.createReadStream(filePath).pipe(res);
+  } else {
+    // 404 fallback
+    const notFoundPath = path.join(DIST_DIR, '404.html');
+    if (fs.existsSync(notFoundPath)) {
+      res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
+      fs.createReadStream(notFoundPath).pipe(res);
+    } else {
+      res.writeHead(404);
+      res.end('Not Found');
     }
-
-    fs.readFile(filePath, (readErr, data) => {
-      if (readErr) {
-        // Fallback to 404.html
-        const notFoundPath = path.join(PUBLIC_DIR, '404.html');
-        fs.readFile(notFoundPath, (err404, data404) => {
-          res.statusCode = 404;
-          res.setHeader('Content-Type', 'text/html; charset=utf-8');
-          if (err404) {
-            res.end('<h1>404 Not Found</h1>');
-          } else {
-            res.end(data404);
-          }
-        });
-        return;
-      }
-
-      const ext = path.extname(filePath).toLowerCase();
-      const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-
-      res.statusCode = 200;
-      res.setHeader('Content-Type', contentType);
-      if (req.method === 'HEAD') {
-        res.end();
-      } else {
-        res.end(data);
-      }
-    });
-  });
+  }
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server listening on http://0.0.0.0:${PORT}`);
+  console.log(`[DevServer] Kisab server running on http://0.0.0.0:${PORT}`);
 });

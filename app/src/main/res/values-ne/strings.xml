@@ -50,7 +50,6 @@
     <string name="quick_sale_no_products">बिक्री राख्न पहिलो उत्पादन थप्नुहोस्।</string>
     <string name="quick_sale_product_name">उत्पादनको नाम</string>
     <string name="quick_sale_product_name_required">उत्पादनको नाम लेख्नुहोस्।</string>
-    <string name="quick_sale_product_name_exists">यो नाम भएको उत्पादन पहिले नै छ।</string>
     <string name="quick_sale_product_added">उत्पादन थपियो</string>
     <string name="quick_sale_quantity_invalid">सही सकारात्मक मात्रा लेख्नुहोस्।</string>
     <string name="quick_sale_rate_invalid">सही सकारात्मक दर लेख्नुहोस्।</string>
@@ -290,7 +289,7 @@
 
     <string name="nav_home">गृह</string>
     <string name="nav_hisab_kitab">हिसाब-किताब</string>
-    <string name="nav_hisab">किसान औजार</string>
+    <string name="nav_hisab">हिसाब</string>
     <string name="nav_settings">सेटिङहरू</string>
     <string name="nav_today">आज</string>
     <string name="nav_khata">खाता</string>
@@ -347,8 +346,6 @@
     <string name="farm_work_sold_label">बेचेको: %1$s</string>
     <string name="farm_work_allocated_label">प्रयोग: %1$s</string>
     <string name="farm_work_unexplained_label">नखुलेको: %1$s</string>
-    <string name="farm_work_over_allocated_label">बढी आवंटन: %1$s</string>
-    <string name="farm_work_unit_mismatch">रेकर्डमा इकाई मिलेको छैन</string>
     <string name="farm_work_all_explained">सबै उत्पादनको हिसाब मिल्यो</string>
     <string name="farm_work_record_production_action">उत्पादन लेख्नुहोस्</string>
     <string name="farm_work_explain_production_action">प्रयोग देखाउनुहोस्</string>
@@ -362,7 +359,7 @@
     <string name="farm_work_morning_label">बिहान: %1$s</string>
     <string name="farm_work_evening_label">बेलुका: %1$s</string>
 
-    <string name="more_hisab_label">किसान औजार</string>
+    <string name="more_hisab_label">हिसाब</string>
     <string name="more_farms_label">फार्महरू</string>
     <string name="more_backup_label">ब्याकअप / पुनर्स्थापना</string>
     <string name="more_about_label">किसाबको बारेमा</string>
@@ -841,12 +838,5 @@
     <string name="notification_channel_updates_description">महत्वपूर्ण किसाब संस्करण र अद्यावधिक सूचनाहरू।</string>
     <string name="notification_channel_reminders_name">सम्झनाहरू</string>
     <string name="notification_channel_reminders_description">ब्याकअप र अन्य गैर-जरुरी सञ्चालन सम्झनाहरू।</string>
-
-    <string name="settings_account_google_sign_in_action">गुगलबाट साइन इन</string>
-    <string name="google_drive_sync_action">गुगल ड्राइभमा सिंक गर्नुहोस्</string>
-    <string name="google_drive_restore_action">गुगल ड्राइभबाट रिस्टोर गर्नुहोस्</string>
-    <string name="toast_google_drive_synced">गुगल ड्राइभमा सिंक भयो।</string>
-    <string name="toast_google_drive_restored">गुगल ड्राइभबाट रिस्टोर भयो।</string>
-    <string name="toast_google_signed_in">गुगलबाट साइन इन भयो।</string>
 
 </resources>

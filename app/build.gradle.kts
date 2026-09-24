@@ -152,13 +152,9 @@ val evidenceFile = layout.buildDirectory.file("reports/verification/local-ci-evi
 
 // Verified Git commit identity for this build. Deterministic: the repository is always a
 // git checkout (local dev and CI), so HEAD is well-defined and stable for a clean tree.
-val gitCommitSha = try {
-    providers.exec {
-        commandLine("git", "rev-parse", "HEAD")
-    }.standardOutput.asText.get().trim()
-} catch (e: Exception) {
-    "unknown"
-}
+val gitCommitSha = providers.exec {
+    commandLine("git", "rev-parse", "HEAD")
+}.standardOutput.asText.get().trim()
 
 // Runs before the gates so a failed/new verification can never leave a stale "passed" artifact.
 // The task is forced to always run (never up-to-date) and deletes any previously written evidence.
@@ -231,7 +227,6 @@ tasks.register("verifyLocal") {
 }
 
 dependencies {
-    implementation("com.susankhya.foundation:foundation-session-android:0.1.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.activity:activity-ktx:1.9.0")

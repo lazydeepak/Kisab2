@@ -1,12 +1,14 @@
 {
-  "name": "kisab-applet",
+  "name": "kisab",
+  "version": "0.2.2",
   "private": true,
+  "description": "Kisab farm ledger cross-platform application and web portal",
   "scripts": {
-    "build": "cd site && node build.js",
-    "dev": "npm run build && node server.js",
-    "start": "node server.js"
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "node site/build.js"
   },
-  "dependencies": {
-    "serve": "^14.2.4"
+  "engines": {
+    "node": ">=18"
   }
 }

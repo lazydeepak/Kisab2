@@ -51,7 +51,6 @@ Remaining: %2$s</string>
     <string name="quick_sale_no_products">Add your first product to record a sale.</string>
     <string name="quick_sale_product_name">Product name</string>
     <string name="quick_sale_product_name_required">Enter a product name.</string>
-    <string name="quick_sale_product_name_exists">A product with this name already exists.</string>
     <string name="quick_sale_product_added">Product added</string>
     <string name="quick_sale_quantity_invalid">Enter a valid positive quantity.</string>
     <string name="quick_sale_rate_invalid">Enter a valid positive rate.</string>
@@ -295,7 +294,7 @@ Unexplained: %4$s %5$s</string>
 
     <string name="nav_home">Home</string>
     <string name="nav_hisab_kitab">Hisab-Kitab</string>
-    <string name="nav_hisab">Farmer Tools</string>
+    <string name="nav_hisab">Hisab</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_today">Today</string>
     <string name="nav_khata">Khata</string>
@@ -352,8 +351,6 @@ Unexplained: %4$s %5$s</string>
     <string name="farm_work_sold_label">Sold: %1$s</string>
     <string name="farm_work_allocated_label">Used/Allocated: %1$s</string>
     <string name="farm_work_unexplained_label">Unexplained: %1$s</string>
-    <string name="farm_work_over_allocated_label">Over-allocated: %1$s</string>
-    <string name="farm_work_unit_mismatch">Unit mismatch in records</string>
     <string name="farm_work_all_explained">All production accounted for</string>
     <string name="farm_work_record_production_action">Record production</string>
     <string name="farm_work_explain_production_action">Explain use</string>
@@ -367,7 +364,7 @@ Unexplained: %4$s %5$s</string>
     <string name="farm_work_morning_label">Morning: %1$s</string>
     <string name="farm_work_evening_label">Evening: %1$s</string>
 
-    <string name="more_hisab_label">Farmer Tools</string>
+    <string name="more_hisab_label">Hisab</string>
     <string name="more_farms_label">Farms</string>
     <string name="more_backup_label">Backup / Restore</string>
     <string name="more_about_label">About Kisab</string>
@@ -846,12 +843,5 @@ Unexplained: %4$s %5$s</string>
     <string name="notification_channel_updates_description">Important Kisab version and update notices.</string>
     <string name="notification_channel_reminders_name">Reminders</string>
     <string name="notification_channel_reminders_description">Backup and other non-urgent operational reminders.</string>
-
-    <string name="settings_account_google_sign_in_action">Sign in with Google</string>
-    <string name="google_drive_sync_action">Sync to Google Drive</string>
-    <string name="google_drive_restore_action">Restore from Google Drive</string>
-    <string name="toast_google_drive_synced">Synced to Google Drive.</string>
-    <string name="toast_google_drive_restored">Restored from Google Drive.</string>
-    <string name="toast_google_signed_in">Signed in with Google.</string>
 
 </resources>

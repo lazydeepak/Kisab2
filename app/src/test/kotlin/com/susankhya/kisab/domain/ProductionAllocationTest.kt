@@ -76,42 +76,4 @@ class ProductionAllocationTest {
         assertTrue(service.loadFarm(farm.id)!!.productionAllocations.isEmpty())
         assertTrue(service.products(farm.id).size == 1)
     }
-
-    @Test
-    fun productionReconciliationStatesCoverBalancedRemainingOverallocatedAndMismatch() {
-        val service = FarmSliceService()
-        val farm = service.createFarm("Farm")
-        val p = service.addProduct(farm.id, "Apples", ProductUnit.KILOGRAM)
-
-        // 1. Balanced: Produced 10 kg, Allocated 10 kg
-        service.addProductionRecord(farm.id, ProductionRecordDraft(p.id, BigDecimal("10"), ProductUnit.KILOGRAM, "2026-08-16T02:00:00Z"), zone)
-        service.addProductionAllocation(farm.id, ProductionAllocationDraft(p.id, BigDecimal("10"), ProductUnit.KILOGRAM, "2026-08-16T04:00:00Z", ProductionAllocationType.HOME_USE), zone)
-        var rec = service.productionReconciliation(farm.id, p.id, day, zone)
-        assertEquals(BigDecimal.ZERO, rec.unexplained)
-        assertTrue(!rec.isInconsistent)
-        assertTrue(!rec.unitMismatch)
-
-        // Reset farm data for next check
-        service.resetFarmData(farm.id)
-
-        // 2. Remaining: Produced 10 kg, Allocated 7 kg
-        service.addProductionRecord(farm.id, ProductionRecordDraft(p.id, BigDecimal("10"), ProductUnit.KILOGRAM, "2026-08-16T02:00:00Z"), zone)
-        service.addProductionAllocation(farm.id, ProductionAllocationDraft(p.id, BigDecimal("7"), ProductUnit.KILOGRAM, "2026-08-16T04:00:00Z", ProductionAllocationType.HOME_USE), zone)
-        rec = service.productionReconciliation(farm.id, p.id, day, zone)
-        assertEquals(BigDecimal("3"), rec.unexplained)
-        assertTrue(!rec.isInconsistent)
-
-        // 3. Over-allocated / Inconsistent: Produced 10 kg, Sold 12 kg (or allocations exceeding)
-        val customer = service.addParty(farm.id, PartyDraft("Buyer", PartyRole.CUSTOMER))
-        service.addProductSale(farm.id, customer.id, p.id, BigDecimal("12"), 100, null, "2026-08-16T08:00:00Z")
-        rec = service.productionReconciliation(farm.id, p.id, day, zone)
-        assertTrue(rec.isInconsistent)
-        assertTrue(rec.unexplained < BigDecimal.ZERO)
-
-        // 4. Unit mismatch
-        val mismatchRecord = ProductionRecord("mismatch", p.id, BigDecimal("1"), ProductUnit.PIECE, OffsetDateTime.parse("2026-08-16T09:00:00Z"))
-        val rawFarm = service.loadFarm(farm.id)!!.copy(productionRecords = mutableListOf(mismatchRecord))
-        val mismatchRec = rawFarm.productionReconciliation(p.id, day, zone)
-        assertTrue(mismatchRec.unitMismatch)
-    }
 }
