@@ -290,7 +290,7 @@
 
     <string name="nav_home">गृह</string>
     <string name="nav_hisab_kitab">हिसाब-किताब</string>
-    <string name="nav_hisab">हिसाब</string>
+    <string name="nav_hisab">किसान औजार</string>
     <string name="nav_settings">सेटिङहरू</string>
     <string name="nav_today">आज</string>
     <string name="nav_khata">खाता</string>
@@ -362,7 +362,7 @@
     <string name="farm_work_morning_label">बिहान: %1$s</string>
     <string name="farm_work_evening_label">बेलुका: %1$s</string>
 
-    <string name="more_hisab_label">हिसाब</string>
+    <string name="more_hisab_label">किसान औजार</string>
     <string name="more_farms_label">फार्महरू</string>
     <string name="more_backup_label">ब्याकअप / पुनर्स्थापना</string>
     <string name="more_about_label">किसाबको बारेमा</string>

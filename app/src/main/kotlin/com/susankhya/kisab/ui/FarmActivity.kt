@@ -2143,18 +2143,25 @@ class FarmActivity : AppCompatActivity() {
     }
 
     private fun updateShellTitle() {
-        val isToday = currentDestination == Destination.TODAY
+        val showSwitcher = currentDestination in setOf(
+            Destination.TODAY,
+            Destination.KHATA,
+            Destination.FARM_WORK,
+            Destination.MORE,
+            Destination.HISAB,
+            Destination.FARM_DETAILS
+        )
         val hasFarm = currentFarmId != null
-        shellFarmSwitchIcon.visibility = if (isToday && hasFarm) View.VISIBLE else View.GONE
-        shellFarmSwitchIcon.isClickable = isToday && hasFarm
-        shellFarmSwitchIcon.isFocusable = isToday && hasFarm
-        shellTitle.isClickable = isToday && hasFarm
-        shellTitle.isFocusable = isToday && hasFarm
+        shellFarmSwitchIcon.visibility = if (showSwitcher && hasFarm) View.VISIBLE else View.GONE
+        shellFarmSwitchIcon.isClickable = showSwitcher && hasFarm
+        shellFarmSwitchIcon.isFocusable = showSwitcher && hasFarm
+        shellTitle.isClickable = showSwitcher && hasFarm
+        shellTitle.isFocusable = showSwitcher && hasFarm
 
         shellTitle.text = when (currentDestination) {
             Destination.TODAY -> {
                 val farm = currentFarmId?.let { service.loadFarm(it) }
-                farm?.name ?: string(R.string.app_name)
+                farm?.name ?: string(R.string.nav_today)
             }
             Destination.KHATA -> string(R.string.nav_khata)
             Destination.FARM_WORK -> string(R.string.nav_farm_work)

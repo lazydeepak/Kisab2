@@ -2,14 +2,14 @@
 
 ## Document status
 
-- Phase: Product audit, information architecture, and redesign specification.
+- Phase: Implementation complete and verified.
 - Planning branch: `design/competitive-farmer-ux-redesign`.
-- Verified baseline: `d3665278dfe1859076ee259347ec1f7c8fa3bf45`.
-- Gate B baseline: `f09cb63`.
-- M7 status: feature-frozen; Gate A, Gate B, and Gate C are `PASS`.
-- Implementation status: not started.
-- Domain schema: 12; this specification does not change it.
-- Audience: product owner, designer, Android implementer, reviewer, and physical-device validator.
+- Implementation: UX-01 through UX-09 (Verified).
+- Baseline: `UX-09-PASS` (Motorola Edge 60 Fusion).
+- M7/M14 status: UX overhaul merged; Pilot-01 validation baseline established.
+- Implementation status: COMPLETE.
+- Domain schema: 12; preserved throughout redesign.
+- Audience: developers, testers, and product owners.
 
 This document defines the target product architecture. It does not authorize implementation until the product-owner decisions at the end are approved.
 
