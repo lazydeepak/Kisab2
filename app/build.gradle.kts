@@ -2,6 +2,7 @@ import java.security.MessageDigest
 
 plugins {
     id("com.android.application")
+    id("org.jetbrains.kotlin.android")
 }
 
 val releaseKeystorePath = providers.environmentVariable("KISAB_KEYSTORE_PATH")
@@ -151,9 +152,13 @@ val evidenceFile = layout.buildDirectory.file("reports/verification/local-ci-evi
 
 // Verified Git commit identity for this build. Deterministic: the repository is always a
 // git checkout (local dev and CI), so HEAD is well-defined and stable for a clean tree.
-val gitCommitSha = providers.exec {
-    commandLine("git", "rev-parse", "HEAD")
-}.standardOutput.asText.get().trim()
+val gitCommitSha = try {
+    providers.exec {
+        commandLine("git", "rev-parse", "HEAD")
+    }.standardOutput.asText.get().trim()
+} catch (e: Exception) {
+    "unknown"
+}
 
 // Runs before the gates so a failed/new verification can never leave a stale "passed" artifact.
 // The task is forced to always run (never up-to-date) and deletes any previously written evidence.
