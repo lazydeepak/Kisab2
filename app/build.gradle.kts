@@ -152,9 +152,14 @@ val evidenceFile = layout.buildDirectory.file("reports/verification/local-ci-evi
 
 // Verified Git commit identity for this build. Deterministic: the repository is always a
 // git checkout (local dev and CI), so HEAD is well-defined and stable for a clean tree.
-val gitCommitSha = providers.exec {
-    commandLine("git", "rev-parse", "HEAD")
-}.standardOutput.asText.get().trim()
+val gitCommitSha = runCatching {
+    val execResult = providers.exec {
+        commandLine("git", "rev-parse", "HEAD")
+        isIgnoreExitValue = true
+    }
+    val sha = execResult.standardOutput.asText.get().trim()
+    if (sha.isNotEmpty() && !sha.startsWith("fatal")) sha else "local-dev"
+}.getOrElse { "local-dev" }
 
 // Runs before the gates so a failed/new verification can never leave a stale "passed" artifact.
 // The task is forced to always run (never up-to-date) and deletes any previously written evidence.

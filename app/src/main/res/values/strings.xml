@@ -51,6 +51,7 @@ Remaining: %2$s</string>
     <string name="quick_sale_no_products">Add your first product to record a sale.</string>
     <string name="quick_sale_product_name">Product name</string>
     <string name="quick_sale_product_name_required">Enter a product name.</string>
+    <string name="quick_sale_product_name_exists">A product with this name already exists.</string>
     <string name="quick_sale_product_added">Product added</string>
     <string name="quick_sale_quantity_invalid">Enter a valid positive quantity.</string>
     <string name="quick_sale_rate_invalid">Enter a valid positive rate.</string>
@@ -351,6 +352,8 @@ Unexplained: %4$s %5$s</string>
     <string name="farm_work_sold_label">Sold: %1$s</string>
     <string name="farm_work_allocated_label">Used/Allocated: %1$s</string>
     <string name="farm_work_unexplained_label">Unexplained: %1$s</string>
+    <string name="farm_work_over_allocated_label">Over-allocated: %1$s</string>
+    <string name="farm_work_unit_mismatch">Unit mismatch in records</string>
     <string name="farm_work_all_explained">All production accounted for</string>
     <string name="farm_work_record_production_action">Record production</string>
     <string name="farm_work_explain_production_action">Explain use</string>

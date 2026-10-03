@@ -75,6 +75,16 @@ const server = http.createServer((req, res) => {
   }
 });
 
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`[DevServer] Port ${PORT} is already in use. Another instance may be running.`);
+    process.exit(0);
+  } else {
+    console.error('[DevServer] Server error:', err);
+    process.exit(1);
+  }
+});
+
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`[DevServer] Kisab server running on http://0.0.0.0:${PORT}`);
 });

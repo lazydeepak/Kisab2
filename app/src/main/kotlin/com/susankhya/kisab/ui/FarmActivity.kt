@@ -4506,8 +4506,17 @@ class FarmActivity : AppCompatActivity() {
                     card.addView(allocView)
                 }
 
-                // Unexplained production status
-                if (reconciliation.unexplained > BigDecimal.ZERO) {
+                // Production reconciliation status
+                if (reconciliation.unitMismatch) {
+                    val mismatchView = TextView(this).apply {
+                        text = string(R.string.farm_work_unit_mismatch)
+                        textSize = 13f
+                        setTextColor(getColor(R.color.payableText))
+                        setTypeface(typeface, android.graphics.Typeface.BOLD)
+                        setPadding(0, dp(6), 0, 0)
+                    }
+                    card.addView(mismatchView)
+                } else if (reconciliation.unexplained > BigDecimal.ZERO) {
                     val unexplainedTile = LinearLayout(this).apply {
                         orientation = LinearLayout.HORIZONTAL
                         background = ContextCompat.getDrawable(this@FarmActivity, R.drawable.bg_metric_tile)
@@ -4535,6 +4544,15 @@ class FarmActivity : AppCompatActivity() {
                     unexplainedTile.addView(warnText)
                     unexplainedTile.addView(reconcileBtn)
                     card.addView(unexplainedTile)
+                } else if (reconciliation.isInconsistent) {
+                    val overAllocatedView = TextView(this).apply {
+                        text = string(R.string.farm_work_over_allocated_label, "${formatQuantity(reconciliation.unexplained.abs())} $unitLabel")
+                        textSize = 13f
+                        setTextColor(getColor(R.color.payableText))
+                        setTypeface(typeface, android.graphics.Typeface.BOLD)
+                        setPadding(0, dp(6), 0, 0)
+                    }
+                    card.addView(overAllocatedView)
                 } else if (reconciliation.produced > BigDecimal.ZERO) {
                     val explainedView = TextView(this).apply {
                         text = string(R.string.farm_work_all_explained)
@@ -4760,11 +4778,32 @@ class FarmActivity : AppCompatActivity() {
             }
             todaySummary.text = if (lines.isEmpty()) string(R.string.production_empty) else lines.joinToString("\n\n")
         }
+        var productionDialog: AlertDialog? = null
+        val deleteButton = Button(this).apply {
+            text = string(R.string.production_delete)
+            setTextColor(getColor(R.color.payableText))
+            background = ContextCompat.getDrawable(this@FarmActivity, R.drawable.button_danger_background)
+            minHeight = dp(44)
+            visibility = View.GONE
+        }
         fun refreshUnitAndExisting() {
             val product = selectedProduct() ?: return
             unitText.text = productUnitLabel(product.defaultUnit, product.customUnitLabel)
             val existing = records.firstOrNull { it.productId == product.id && it.session == sessionOf() }
             quantityInput.setText(existing?.quantity?.let(::formatQuantity).orEmpty())
+            if (existing != null) {
+                deleteButton.visibility = View.VISIBLE
+                deleteButton.setOnClickListener {
+                    val delDialog = AlertDialog.Builder(this).setTitle(R.string.production_delete_title).setMessage(R.string.production_delete_message)
+                        .setPositiveButton(R.string.production_delete) { _, _ ->
+                            service.deleteProductionRecord(farmId, existing.id); productionDialog?.dismiss(); render(); showToast(R.string.production_deleted)
+                        }.setNegativeButton(R.string.action_cancel, null).create()
+                    delDialog.show()
+                    scaleDialogContent(delDialog)
+                }
+            } else {
+                deleteButton.visibility = View.GONE
+            }
         }
         val allocationButton = Button(this).apply { text = string(R.string.production_allocate); minHeight = dp(48) }
         content.addView(todaySummary)
@@ -4775,10 +4814,12 @@ class FarmActivity : AppCompatActivity() {
         content.addView(unitText)
         content.addView(sessionGroup)
         content.addView(dateTimeButton)
+        content.addView(deleteButton)
 
         val dialog = AlertDialog.Builder(this).setTitle(R.string.production_title).setView(scrollView)
             .setNeutralButton(R.string.production_add_product) { _, _ -> showProductCreationDialog { showProductionDialog(targetProductId) } }
             .setPositiveButton(R.string.production_save, null).setNegativeButton(R.string.action_cancel, null).create()
+        productionDialog = dialog
         dialog.setOnShowListener {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 val product = selectedProduct() ?: return@setOnClickListener
@@ -4802,16 +4843,6 @@ class FarmActivity : AppCompatActivity() {
         if (records.isNotEmpty()) {
             dialog.setOnDismissListener { }
             content.setOnClickListener { refreshSummary() }
-        }
-        records.firstOrNull()?.let { first ->
-            dialog.setButton(AlertDialog.BUTTON_NEUTRAL, string(R.string.production_delete), DialogInterface.OnClickListener { _, _ ->
-                val delDialog = AlertDialog.Builder(this).setTitle(R.string.production_delete_title).setMessage(R.string.production_delete_message)
-                    .setPositiveButton(R.string.production_delete) { _, _ ->
-                        service.deleteProductionRecord(farmId, first.id); dialog.dismiss(); render(); showToast(R.string.production_deleted)
-                    }.setNegativeButton(R.string.action_cancel, null).create()
-                delDialog.show()
-                scaleDialogContent(delDialog)
-            })
         }
     }
 
@@ -4936,8 +4967,14 @@ class FarmActivity : AppCompatActivity() {
                     dialog.dismiss()
                     showToast(R.string.quick_sale_product_added)
                     afterSave()
+                } catch (exception: IllegalArgumentException) {
+                    if (exception.message?.contains("already exists", ignoreCase = true) == true) {
+                        showEditorError(FarmUiError.PRODUCT_NAME_EXISTS, nameInput)
+                    } else {
+                        showValidationMessage(FarmUiError.UNEXPECTED.resourceId)
+                    }
                 } catch (exception: Exception) {
-                    Toast.makeText(this, exception.message ?: string(R.string.error_unexpected), Toast.LENGTH_SHORT).show()
+                    showValidationMessage(FarmUiError.UNEXPECTED.resourceId)
                 }
             }
         }
@@ -6565,9 +6602,10 @@ class FarmActivity : AppCompatActivity() {
         applyTextScale(shellRoot, scale)
     }
 
-    /** Dialog windows sit outside [shellRoot]; scale their content with the same app text size. */
+    /** Dialog windows sit outside [shellRoot]; scale their content with the same app text size and resize for IME. */
     private fun scaleDialogContent(dialog: AlertDialog) {
         val root = dialog.window?.decorView ?: return
+        dialog.window?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         val scale = textSizePreferences.load().toFloat() / AppTextSize.BASE_SP
         applyTextScale(root, scale)
     }

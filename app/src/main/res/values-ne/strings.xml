@@ -50,6 +50,7 @@
     <string name="quick_sale_no_products">बिक्री राख्न पहिलो उत्पादन थप्नुहोस्।</string>
     <string name="quick_sale_product_name">उत्पादनको नाम</string>
     <string name="quick_sale_product_name_required">उत्पादनको नाम लेख्नुहोस्।</string>
+    <string name="quick_sale_product_name_exists">यो नाम भएको उत्पादन पहिले नै छ।</string>
     <string name="quick_sale_product_added">उत्पादन थपियो</string>
     <string name="quick_sale_quantity_invalid">सही सकारात्मक मात्रा लेख्नुहोस्।</string>
     <string name="quick_sale_rate_invalid">सही सकारात्मक दर लेख्नुहोस्।</string>
@@ -346,6 +347,8 @@
     <string name="farm_work_sold_label">बेचेको: %1$s</string>
     <string name="farm_work_allocated_label">प्रयोग: %1$s</string>
     <string name="farm_work_unexplained_label">नखुलेको: %1$s</string>
+    <string name="farm_work_over_allocated_label">बढी आवंटन: %1$s</string>
+    <string name="farm_work_unit_mismatch">रेकर्डमा इकाई मिलेको छैन</string>
     <string name="farm_work_all_explained">सबै उत्पादनको हिसाब मिल्यो</string>
     <string name="farm_work_record_production_action">उत्पादन लेख्नुहोस्</string>
     <string name="farm_work_explain_production_action">प्रयोग देखाउनुहोस्</string>

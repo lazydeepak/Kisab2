@@ -180,6 +180,15 @@ function main() {
       return locale === 'en' ? route : `/ne${route}`;
     }
 
+    function switchPathFor(page) {
+      const route = ROUTES[page];
+      if (locale === 'en') {
+        return route === '/' ? '/ne/' : `/ne${route}`;
+      } else {
+        return route;
+      }
+    }
+
     for (const page of PAGES) {
       const pathHere = pathFor(page);
       const meta = content.meta[page];
@@ -195,7 +204,7 @@ function main() {
           lang: locale,
           lang_switch_label: common.lang_switch_label,
           lang_switch_lang: langSwitchLang,
-          lang_switch_href: pathFor(page),
+          lang_switch_href: switchPathFor(page),
           path_home: pathFor('home'),
           path_features: pathFor('features'),
           path_download: pathFor('download'),
