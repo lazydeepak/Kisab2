@@ -37,11 +37,11 @@
     },
     "download": {
       "title": "Download Kisab pilot APK",
-      "description": "Download the current Kisab pilot build (v0.2.1) as a signed APK from GitHub Releases, with install guidance and checksums."
+      "description": "Download the current Kisab pilot build (v0.3.0) as a signed APK from GitHub Releases, with install guidance and checksums."
     },
     "releases": {
       "title": "Kisab releases",
-      "description": "Kisab release history: v0.2.1, v0.2.0, v0.1.0 with version codes, dates, checksums, and signed APK links from GitHub Releases."
+      "description": "Kisab release history: v0.3.0, v0.2.0, v0.1.0 with version codes, dates, checksums, and signed APK links from GitHub Releases."
     },
     "help": {
       "title": "Help and FAQ — Kisab",
@@ -62,7 +62,7 @@
     "hero_lead": "Kisab is a simple, offline Android app for recording what happens on your farm — sales, purchases, who owes you, what you produced, and what you still have. No internet needed for daily work.",
     "hero_cta_download": "Download the pilot APK",
     "hero_cta_features": "See what it does",
-    "pilot_badge": "Pilot · v0.2.1",
+    "pilot_badge": "Pilot · v0.3.0",
     "pilot_note": "Kisab is in a farmer pilot. Current builds are signed APKs distributed through GitHub Releases.",
     "phone_section_label": "Illustrative preview — the app as it looks today",
     "phone_caption_today": "Today (आज) — the day's money and work at a glance",
@@ -119,8 +119,8 @@
       { "title": "No cloud yet", "text": "No account, no login, no cross-device sync. Data lives on the phone and in backups you export." }
     ],
     "cta_heading": "Ready to try Kisab?",
-    "cta_text": "The current pilot build is v0.2.1 — signed, verified, and published through GitHub Releases.",
-    "cta_button": "Download v0.2.1",
+    "cta_text": "The current pilot build is v0.3.0 — signed, verified, and published through GitHub Releases.",
+    "cta_button": "Download v0.3.0",
     "cta_secondary": "Release history"
   },
   "features": {
@@ -180,7 +180,7 @@
     "distribution_note": "Distribution status: this is a private, pilot distribution. There is no Play Store listing yet. Install only from this page or the official GitHub Releases of the Kisab project.",
     "current_heading": "Current pilot release",
     "version_label": "Version",
-    "version_value": "v0.2.1",
+    "version_value": "v0.3.0",
     "versioncode_label": "Version code",
     "versioncode_value": "4",
     "published_label": "Published",
@@ -193,13 +193,13 @@
     "sha256_value": "443e6582b3766348b60c3e608daedd5dfbea0b40f601bb9c661fe88961e417b7",
     "download_button": "Download signed APK",
     "download_note_suffix": "hosted on GitHub Releases",
-    "gh_release_link": "View the v0.2.1 release on GitHub",
+    "gh_release_link": "View the v0.3.0 release on GitHub",
     "what_is_apk_heading": "What is this file?",
     "what_is_apk_text": "This is the official Kisab Android application, signed with the production release key. It is delivered as an APK because Kisab is not on the Play Store yet. GitHub Releases is the source of truth for the signed file; you can verify the SHA-256 checksum after download.",
     "install_heading": "How to install on Android",
     "install_steps": [
       { "title": "Download the APK", "text": "Tap the download button above and wait for the file to finish downloading." },
-      { "title": "Open the file", "text": "Open the downloaded kisab-v0.2.1-rc-signed.apk file from your Downloads or file manager." },
+      { "title": "Open the file", "text": "Open the downloaded kisab-v0.3.0-rc-signed.apk file from your Downloads or file manager." },
       { "title": "Allow this one install", "text": "Android will ask for permission to install from unknown sources for this app. Allow it only for Kisab downloads, then keep the setting off for everything else. You can also use the options Android offers for a single install." },
       { "title": "Install and open", "text": "Complete the install and open Kisab. Create your first farm to start recording." }
     ],
@@ -215,7 +215,7 @@
     "page_heading": "Kisab release history",
     "page_lead": "GitHub Releases is the authoritative source for signed Kisab APKs. This page reflects the published releases — nothing is invented.",
     "current_callout_title": "Current release",
-    "current_callout_text": "v0.2.1 (version code 4) is the current pilot build and the live OTA update target. Install it if you are joining the pilot now.",
+    "current_callout_text": "v0.3.0 (version code 4) is the current pilot build and the live OTA update target. Install it if you are joining the pilot now.",
     "table_version": "Version",
     "table_code": "Code",
     "table_published": "Published",

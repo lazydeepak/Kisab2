@@ -1,6 +1,6 @@
 {
   "name": "kisab",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "private": true,
   "description": "Kisab farm ledger cross-platform application and web portal",
   "scripts": {
