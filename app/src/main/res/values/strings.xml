@@ -400,6 +400,7 @@ Unexplained: %4$s %5$s</string>
     <string name="party_role_label">Role</string>
     <string name="party_contact_label">Contact</string>
     <string name="party_contact_hint">Phone number or other contact</string>
+    <string name="select_from_contacts">Choose from Contacts</string>
     <string name="party_notes_label">Notes</string>
     <string name="party_notes_hint">Optional notes</string>
     <string name="party_role_customer">Customer</string>
@@ -414,6 +415,7 @@ Unexplained: %4$s %5$s</string>
     <string name="delete_party_action">Delete</string>
     <string name="toast_party_saved">Party saved</string>
     <string name="toast_party_deleted">Party deleted</string>
+    <string name="toast_contact_picker_failed">Unable to open contacts</string>
 
     <string name="trade_type_sale">Sale</string>
     <string name="trade_type_purchase">Purchase</string>
@@ -846,5 +848,8 @@ Unexplained: %4$s %5$s</string>
     <string name="notification_channel_updates_description">Important Kisab version and update notices.</string>
     <string name="notification_channel_reminders_name">Reminders</string>
     <string name="notification_channel_reminders_description">Backup and other non-urgent operational reminders.</string>
+
+    <string name="item_library_choose_suggestion">Choose from library (optional)</string>
+    <string name="item_library_general_suggestions">General suggestions</string>
 
 </resources>

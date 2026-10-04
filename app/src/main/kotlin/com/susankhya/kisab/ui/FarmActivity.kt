@@ -321,6 +321,7 @@ class FarmActivity : AppCompatActivity() {
     private lateinit var partyNameInput: EditText
     private lateinit var partyRoleSpinner: Spinner
     private lateinit var partyContactInput: EditText
+    private lateinit var selectPartyContactButton: Button
     private lateinit var partyNotesInput: EditText
     private lateinit var partyValidationMessageText: TextView
     private lateinit var savePartyButton: Button
@@ -561,6 +562,7 @@ class FarmActivity : AppCompatActivity() {
 
     private lateinit var createBackupDocumentLauncher: ActivityResultLauncher<Intent>
     private lateinit var openBackupDocumentLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var pickContactLauncher: ActivityResultLauncher<Intent>
     private lateinit var languagePreferences: AppLanguagePreferences
     private lateinit var textSizePreferences: AppTextSizePreferences
     private lateinit var appearancePreferences: AppearancePreferences
@@ -688,6 +690,34 @@ class FarmActivity : AppCompatActivity() {
             } catch (exception: Exception) {
                 Log.e(LOG_TAG, "import backup failed", exception)
                 showValidationMessage(FarmUiError.UNEXPECTED.resourceId)
+            }
+        }
+
+        pickContactLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val uri = result.data?.data ?: return@registerForActivityResult
+                val cursor = contentResolver.query(
+                    uri,
+                    arrayOf(
+                        android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                        android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER
+                    ),
+                    null, null, null
+                )
+                cursor?.use {
+                    if (it.moveToFirst()) {
+                        val nameIdx = it.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+                        val numberIdx = it.getColumnIndex(android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER)
+                        val name = if (nameIdx >= 0) it.getString(nameIdx) else ""
+                        val number = if (numberIdx >= 0) it.getString(numberIdx) else ""
+                        if (name.isNotBlank() && partyNameInput.text?.toString()?.isBlank() != false) {
+                            partyNameInput.setText(name)
+                        }
+                        if (number.isNotBlank()) {
+                            partyContactInput.setText(number)
+                        }
+                    }
+                }
             }
         }
 
@@ -1032,6 +1062,13 @@ class FarmActivity : AppCompatActivity() {
         partyNameInput = findViewById(R.id.partyNameInput)
         partyRoleSpinner = findViewById(R.id.partyRoleSpinner)
         partyContactInput = findViewById(R.id.partyContactInput)
+        selectPartyContactButton = findViewById(R.id.selectPartyContactButton)
+        selectPartyContactButton.setOnClickListener {
+            val intent = Intent(Intent.ACTION_PICK, android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+            runCatching { pickContactLauncher.launch(intent) }.onFailure {
+                showToast(R.string.toast_contact_picker_failed)
+            }
+        }
         partyNotesInput = findViewById(R.id.partyNotesInput)
         partyValidationMessageText = findViewById(R.id.partyValidationMessageText)
         savePartyButton = findViewById(R.id.savePartyButton)
@@ -3614,6 +3651,7 @@ class FarmActivity : AppCompatActivity() {
         roleLabel.visibility = visibility
         partyRoleSpinner.visibility = visibility
         partyContactInput.visibility = visibility
+        selectPartyContactButton.visibility = visibility
         partyNotesInput.visibility = visibility
         savePartyButton.visibility = visibility
         cancelPartyButton.visibility = visibility
@@ -4378,25 +4416,65 @@ class FarmActivity : AppCompatActivity() {
     }
 
     private fun showSupplyCreationDialog(afterSave: (FarmSupply) -> Unit) {
-        val content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(24), dp(8), dp(24), 0) }
+        val farmId = currentFarmId ?: return showMissingFarmMessage()
+        val farm = service.loadFarm(farmId) ?: return showMissingFarmMessage()
+        val suggestions = farm.activities.flatMap { FarmActivityCatalog.predefinedSupplies(it) }.distinctBy { it.name }
+
+        val scrollView = ScrollView(this).apply { isFillViewport = true }
+        val content = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(20), dp(12), dp(20), dp(12))
+        }
+        scrollView.addView(content)
+
         val nameInput = EditText(this).apply { hint = string(R.string.supply_name_hint) }
         val units = listOf(ProductUnit.KILOGRAM, ProductUnit.LITRE, ProductUnit.BAG, ProductUnit.PACKET, ProductUnit.BOTTLE, ProductUnit.PIECE, ProductUnit.MANA, ProductUnit.PATHI, ProductUnit.MURI)
         val unitSpinner = Spinner(this)
-        unitSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, units.map { supplyUnitLabel(it, "") }).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
-        content.addView(nameInput); content.addView(unitSpinner)
-        val dialog = AlertDialog.Builder(this).setTitle(R.string.supply_add).setView(content).setPositiveButton(R.string.action_ok, null).setNegativeButton(R.string.action_cancel, null).create()
+        unitSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, units.map { supplyUnitLabel(it, "") })
+            .also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+
+        if (suggestions.isNotEmpty()) {
+            val suggestionSpinner = Spinner(this)
+            val suggestionChoices = listOf(string(R.string.item_library_choose_suggestion)) + suggestions.map { it.name }
+            suggestionSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, suggestionChoices)
+                .also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+            suggestionSpinner.onItemSelectedListener = simpleItemSelectedListener {
+                val idx = suggestionSpinner.selectedItemPosition
+                if (idx > 0) {
+                    val suggestion = suggestions[idx - 1]
+                    nameInput.setText(suggestion.name)
+                    val unitIdx = units.indexOf(suggestion.defaultUnit)
+                    if (unitIdx >= 0) unitSpinner.setSelection(unitIdx)
+                }
+            }
+            content.addView(suggestionSpinner)
+            suggestionSpinner.setPadding(0, 0, 0, dp(12))
+        }
+
+        content.addView(nameInput)
+        content.addView(unitSpinner)
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.supply_add)
+            .setView(scrollView)
+            .setPositiveButton(R.string.action_ok, null)
+            .setNegativeButton(R.string.action_cancel, null)
+            .create()
         dialog.setOnShowListener {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                val farmId = currentFarmId ?: return@setOnClickListener
                 val name = nameInput.text?.toString()?.trim().orEmpty()
                 if (name.isBlank()) return@setOnClickListener showToast(R.string.supply_name_required)
                 try {
                     val supply = service.addSupply(farmId, name, units[unitSpinner.selectedItemPosition])
-                    dialog.dismiss(); showToast(R.string.supply_add_saved); afterSave(supply)
-                } catch (exception: Exception) { Toast.makeText(this, exception.message ?: string(R.string.error_unexpected), Toast.LENGTH_SHORT).show() }
+                    dialog.dismiss()
+                    showToast(R.string.supply_add_saved)
+                    afterSave(supply)
+                } catch (exception: Exception) {
+                    Toast.makeText(this, exception.message ?: string(R.string.error_unexpected), Toast.LENGTH_SHORT).show()
+                }
             }
         }
         dialog.show()
+        scaleDialogContent(dialog)
     }
 
     private fun renderFarmWork() {
@@ -4938,17 +5016,41 @@ class FarmActivity : AppCompatActivity() {
     }
 
     private fun showProductCreationDialog(afterSave: () -> Unit) {
+        val farmId = currentFarmId ?: return showMissingFarmMessage()
+        val farm = service.loadFarm(farmId) ?: return showMissingFarmMessage()
+        val suggestions = farm.activities.flatMap { FarmActivityCatalog.predefinedProducts(it) }.distinctBy { it.name }
+
         val scrollView = ScrollView(this).apply { isFillViewport = true }
         val content = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(20), dp(12), dp(20), dp(12))
         }
         scrollView.addView(content)
+
+        val units = listOf(ProductUnit.LITRE, ProductUnit.KILOGRAM, ProductUnit.PIECE, ProductUnit.BAG, ProductUnit.PACKET, ProductUnit.BOTTLE, ProductUnit.MANA, ProductUnit.PATHI, ProductUnit.MURI)
         val nameInput = EditText(this).apply { hint = string(R.string.quick_sale_product_name) }
         val unitSpinner = Spinner(this)
-        val units = listOf(ProductUnit.LITRE, ProductUnit.KILOGRAM, ProductUnit.PIECE, ProductUnit.BAG, ProductUnit.PACKET, ProductUnit.BOTTLE, ProductUnit.MANA, ProductUnit.PATHI, ProductUnit.MURI)
         unitSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, units.map { productUnitLabel(it, "") })
             .also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+
+        if (suggestions.isNotEmpty()) {
+            val suggestionSpinner = Spinner(this)
+            val suggestionChoices = listOf(string(R.string.item_library_choose_suggestion)) + suggestions.map { it.name }
+            suggestionSpinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, suggestionChoices)
+                .also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+            suggestionSpinner.onItemSelectedListener = simpleItemSelectedListener {
+                val idx = suggestionSpinner.selectedItemPosition
+                if (idx > 0) {
+                    val suggestion = suggestions[idx - 1]
+                    nameInput.setText(suggestion.name)
+                    val unitIdx = units.indexOf(suggestion.defaultUnit)
+                    if (unitIdx >= 0) unitSpinner.setSelection(unitIdx)
+                }
+            }
+            content.addView(suggestionSpinner)
+            suggestionSpinner.setPadding(0, 0, 0, dp(12))
+        }
+
         content.addView(nameInput)
         content.addView(unitSpinner)
         val dialog = AlertDialog.Builder(this)
@@ -4959,7 +5061,6 @@ class FarmActivity : AppCompatActivity() {
             .create()
         dialog.setOnShowListener {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                val farmId = currentFarmId ?: return@setOnClickListener
                 val name = nameInput.text?.toString()?.trim().orEmpty()
                 if (name.isBlank()) return@setOnClickListener showToast(R.string.quick_sale_product_name_required)
                 try {

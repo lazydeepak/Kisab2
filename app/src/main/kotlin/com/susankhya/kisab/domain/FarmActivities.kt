@@ -160,6 +160,127 @@ object FarmActivityCatalog {
     }
 
     /**
+     * Predefined products for an activity. These are suggestions for the user
+     * when they add a new product to their farm.
+     */
+    fun predefinedProducts(activity: FarmActivityType): List<PredefinedProduct> = when (activity) {
+        FarmActivityType.CROPS -> listOf(
+            PredefinedProduct("Paddy", ProductUnit.MURI),
+            PredefinedProduct("Wheat", ProductUnit.KILOGRAM),
+            PredefinedProduct("Maize", ProductUnit.MURI),
+            PredefinedProduct("Millet", ProductUnit.MURI),
+            PredefinedProduct("Barley", ProductUnit.KILOGRAM),
+            PredefinedProduct("Buckwheat", ProductUnit.KILOGRAM),
+            PredefinedProduct("Lentil", ProductUnit.KILOGRAM),
+            PredefinedProduct("Mustard", ProductUnit.PATHI),
+            PredefinedProduct("Soybean", ProductUnit.PATHI)
+        )
+        FarmActivityType.VEGETABLES -> listOf(
+            PredefinedProduct("Tomato", ProductUnit.KILOGRAM),
+            PredefinedProduct("Potato", ProductUnit.KILOGRAM),
+            PredefinedProduct("Onion", ProductUnit.KILOGRAM),
+            PredefinedProduct("Garlic", ProductUnit.KILOGRAM),
+            PredefinedProduct("Cauliflower", ProductUnit.KILOGRAM),
+            PredefinedProduct("Cabbage", ProductUnit.KILOGRAM),
+            PredefinedProduct("Brinjal", ProductUnit.KILOGRAM),
+            PredefinedProduct("Chilli", ProductUnit.KILOGRAM),
+            PredefinedProduct("Cucumber", ProductUnit.KILOGRAM),
+            PredefinedProduct("Pumpkin", ProductUnit.PIECE),
+            PredefinedProduct("Spinach", ProductUnit.PIECE)
+        )
+        FarmActivityType.FRUITS_ORCHARD -> listOf(
+            PredefinedProduct("Apple", ProductUnit.KILOGRAM),
+            PredefinedProduct("Orange", ProductUnit.KILOGRAM),
+            PredefinedProduct("Banana", ProductUnit.PIECE),
+            PredefinedProduct("Mango", ProductUnit.KILOGRAM),
+            PredefinedProduct("Grapes", ProductUnit.KILOGRAM),
+            PredefinedProduct("Pomegranate", ProductUnit.KILOGRAM),
+            PredefinedProduct("Lemon", ProductUnit.PIECE),
+            PredefinedProduct("Guava", ProductUnit.KILOGRAM),
+            PredefinedProduct("Papaya", ProductUnit.PIECE)
+        )
+        FarmActivityType.POULTRY -> listOf(
+            PredefinedProduct("Egg", ProductUnit.PIECE),
+            PredefinedProduct("Chicken (Meat)", ProductUnit.KILOGRAM),
+            PredefinedProduct("Live Chicken", ProductUnit.KILOGRAM),
+            PredefinedProduct("Manure", ProductUnit.BAG)
+        )
+        FarmActivityType.CATTLE_BUFFALO_DAIRY -> listOf(
+            PredefinedProduct("Milk", ProductUnit.LITRE),
+            PredefinedProduct("Ghee", ProductUnit.KILOGRAM),
+            PredefinedProduct("Curd", ProductUnit.LITRE),
+            PredefinedProduct("Paneer", ProductUnit.KILOGRAM),
+            PredefinedProduct("Khoa", ProductUnit.KILOGRAM),
+            PredefinedProduct("Manure", ProductUnit.BAG),
+            PredefinedProduct("Calf", ProductUnit.PIECE)
+        )
+        FarmActivityType.GOAT_SHEEP -> listOf(
+            PredefinedProduct("Goat (Live)", ProductUnit.PIECE),
+            PredefinedProduct("Meat", ProductUnit.KILOGRAM),
+            PredefinedProduct("Wool", ProductUnit.KILOGRAM),
+            PredefinedProduct("Manure", ProductUnit.BAG)
+        )
+        FarmActivityType.PIG -> listOf(
+            PredefinedProduct("Pig (Live)", ProductUnit.PIECE),
+            PredefinedProduct("Meat", ProductUnit.KILOGRAM),
+            PredefinedProduct("Piglets", ProductUnit.PIECE),
+            PredefinedProduct("Manure", ProductUnit.BAG)
+        )
+        FarmActivityType.FISHERY -> listOf(
+            PredefinedProduct("Fish (Live)", ProductUnit.KILOGRAM),
+            PredefinedProduct("Dead Fish", ProductUnit.KILOGRAM)
+        )
+        FarmActivityType.OTHER -> emptyList()
+    }
+
+    /**
+     * Predefined supplies for an activity. These are suggestions for the user
+     * when they add a new supply to their farm.
+     */
+    fun predefinedSupplies(activity: FarmActivityType): List<PredefinedSupply> = when (activity) {
+        FarmActivityType.CROPS,
+        FarmActivityType.VEGETABLES,
+        FarmActivityType.FRUITS_ORCHARD -> listOf(
+            PredefinedSupply("Seeds", ProductUnit.KILOGRAM),
+            PredefinedSupply("Urea", ProductUnit.KILOGRAM),
+            PredefinedSupply("DAP", ProductUnit.KILOGRAM),
+            PredefinedSupply("Potash", ProductUnit.KILOGRAM),
+            PredefinedSupply("Compost", ProductUnit.BAG),
+            PredefinedSupply("Pesticides", ProductUnit.LITRE)
+        )
+        FarmActivityType.POULTRY -> listOf(
+            PredefinedSupply("Chicks", ProductUnit.PIECE),
+            PredefinedSupply("Feed", ProductUnit.BAG),
+            PredefinedSupply("Medicine", ProductUnit.PACKET),
+            PredefinedSupply("Vaccines", ProductUnit.BOTTLE),
+            PredefinedSupply("Husk", ProductUnit.BAG)
+        )
+        FarmActivityType.CATTLE_BUFFALO_DAIRY -> listOf(
+            PredefinedSupply("Feed (Choker)", ProductUnit.BAG),
+            PredefinedSupply("Grass/Hay", ProductUnit.BAG),
+            PredefinedSupply("Medicine", ProductUnit.PACKET),
+            PredefinedSupply("Mineral Block", ProductUnit.PIECE),
+            PredefinedSupply("Semen", ProductUnit.BOTTLE)
+        )
+        FarmActivityType.GOAT_SHEEP -> listOf(
+            PredefinedSupply("Feed", ProductUnit.BAG),
+            PredefinedSupply("Medicine", ProductUnit.PACKET),
+            PredefinedSupply("Vaccines", ProductUnit.BOTTLE)
+        )
+        FarmActivityType.PIG -> listOf(
+            PredefinedSupply("Feed", ProductUnit.BAG),
+            PredefinedSupply("Medicine", ProductUnit.PACKET)
+        )
+        FarmActivityType.FISHERY -> listOf(
+            PredefinedSupply("Fingerlings/Fry", ProductUnit.PIECE),
+            PredefinedSupply("Fish Feed", ProductUnit.BAG),
+            PredefinedSupply("Lime", ProductUnit.KILOGRAM),
+            PredefinedSupply("Medicine", ProductUnit.BOTTLE)
+        )
+        FarmActivityType.OTHER -> emptyList()
+    }
+
+    /**
      * Transaction-editor activity choices for a farm running [activities].
      * `null` represents the general/farm-wide option. [currentActivity] is a
      * transaction's existing association (possibly to a now-disabled
@@ -176,6 +297,22 @@ object FarmActivityCatalog {
         return listOf(null) + choices
     }
 }
+
+/**
+ * A suggested product for a farm activity.
+ */
+data class PredefinedProduct(
+    val name: String,
+    val defaultUnit: ProductUnit
+)
+
+/**
+ * A suggested supply for a farm activity.
+ */
+data class PredefinedSupply(
+    val name: String,
+    val defaultUnit: ProductUnit
+)
 
 /**
  * Per-activity accounting projection. [activity] of `null` means the

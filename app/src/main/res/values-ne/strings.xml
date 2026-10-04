@@ -395,6 +395,7 @@
     <string name="party_role_label">भूमिका</string>
     <string name="party_contact_label">सम्पर्क</string>
     <string name="party_contact_hint">फोन नम्बर वा अन्य सम्पर्क</string>
+    <string name="select_from_contacts">सम्पर्क सूचीबाट छान्नुहोस्</string>
     <string name="party_notes_label">टिप्पणी</string>
     <string name="party_notes_hint">ऐच्छिक टिप्पणी</string>
     <string name="party_role_customer">ग्राहक</string>
@@ -409,6 +410,7 @@
     <string name="delete_party_action">मेटाउनुहोस्</string>
     <string name="toast_party_saved">पार्टी बचत भयो</string>
     <string name="toast_party_deleted">पार्टी मेटाइयो</string>
+    <string name="toast_contact_picker_failed">सम्पर्क खोल्न सकिएन</string>
 
     <string name="trade_type_sale">बिक्री</string>
     <string name="trade_type_purchase">खरिद</string>
@@ -841,5 +843,8 @@
     <string name="notification_channel_updates_description">महत्वपूर्ण किसाब संस्करण र अद्यावधिक सूचनाहरू।</string>
     <string name="notification_channel_reminders_name">सम्झनाहरू</string>
     <string name="notification_channel_reminders_description">ब्याकअप र अन्य गैर-जरुरी सञ्चालन सम्झनाहरू।</string>
+
+    <string name="item_library_choose_suggestion">लाइब्रेरीबाट छान्नुहोस् (ऐच्छिक)</string>
+    <string name="item_library_general_suggestions">सामान्य सुझावहरू</string>
 
 </resources>
