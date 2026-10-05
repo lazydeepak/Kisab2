@@ -65,16 +65,13 @@ class FarmOverviewAndHisabDeviceTest {
             overviewCashIncome(scenario, formattedFor(scenario, 100000))
             overviewCashExpense(scenario, formattedFor(scenario, 0))
             overviewCashNet(scenario, formattedFor(scenario, 100000))
-            assertOverviewEmptyState(scenario, R.id.overviewCashEmptyText, View.GONE)
 
             // Trade renders in THIS_MONTH with period-scoped totals: sales 20,000
             // (in-window) and purchases 10,000 (only the in-window purchase).
             assertViewTextContains(scenario, R.id.overviewSalesText, formattedFor(scenario, 20000))
             assertViewTextContains(scenario, R.id.overviewPurchasesText, formattedFor(scenario, 10000))
-            assertOverviewEmptyState(scenario, R.id.overviewTradeEmptyText, View.GONE)
 
             // Position (start-independent) covers both purchases and the sale.
-            assertOverviewEmptyState(scenario, R.id.overviewPositionEmptyText, View.GONE)
             assertViewTextContains(scenario, R.id.overviewReceivableText, formattedFor(scenario, 20000))
             assertViewTextContains(scenario, R.id.overviewPayableText, formattedFor(scenario, 20000))
             assertViewTextContains(scenario, R.id.overviewNetPositionText, formattedFor(scenario, 0))
@@ -106,9 +103,7 @@ class FarmOverviewAndHisabDeviceTest {
         try {
             createFarm("Empty Overview Farm")
             onView(withId(R.id.navKhataItem)).perform(click())
-            assertOverviewEmptyState(scenario, R.id.overviewCashEmptyText, View.VISIBLE)
-            assertOverviewEmptyState(scenario, R.id.overviewTradeEmptyText, View.VISIBLE)
-            assertOverviewEmptyState(scenario, R.id.overviewPositionEmptyText, View.VISIBLE)
+            assertOverviewEmptyState(scenario, R.id.tradesEmptyText, View.VISIBLE)
             assertOverviewEmptyState(scenario, R.id.overviewTrendEmptyText, View.VISIBLE)
         } finally {
             scenario.close()

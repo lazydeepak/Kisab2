@@ -60,11 +60,14 @@ class FarmSliceService(private val store: FarmStore = InMemoryFarmStore()) {
         require(currencyCode.matches(CURRENCY_CODE_PATTERN)) { "Farm currency must be a 3-letter ISO code" }
         val orderedActivities = FarmActivityCatalog.displayOrder.filter { it in activities }
         require(orderedActivities.size == activities.distinct().size) { "Unknown farm activity requested" }
+        val activitySet = orderedActivities.toSet()
         val farm = FarmState(
             id = "farm-${UUID.randomUUID()}",
             name = name,
             currencyCode = currencyCode.uppercase(),
-            activities = orderedActivities.toMutableList()
+            activities = orderedActivities.toMutableList(),
+            products = seedProducts(activitySet).toMutableList(),
+            supplies = seedSupplies(activitySet).toMutableList()
         )
         store.saveFarm(farm)
         store.setCurrentFarmId(farm.id)
@@ -92,9 +95,19 @@ class FarmSliceService(private val store: FarmStore = InMemoryFarmStore()) {
         val disabled = (
             farm.disabledActivities.filter { it !in enabledOrdered } + newlyDisabled
             ).distinct().toMutableList()
+
+        // Auto-provision predefined items for newly enabled activities
+        val newlyEnabled = enabledOrdered.filter { it !in farm.activities }
+        val newProducts = seedProducts(newlyEnabled.toSet())
+            .filter { p -> farm.products.none { it.name.equals(p.name, ignoreCase = true) } }
+        val newSupplies = seedSupplies(newlyEnabled.toSet())
+            .filter { s -> farm.supplies.none { it.name.equals(s.name, ignoreCase = true) } }
+
         val updated = farm.copy(
             activities = enabledOrdered.toMutableList(),
-            disabledActivities = disabled
+            disabledActivities = disabled,
+            products = (farm.products + newProducts).toMutableList(),
+            supplies = (farm.supplies + newSupplies).toMutableList()
         )
         FarmStateValidator.validateFarm(updated)
         store.saveFarm(updated)
@@ -125,6 +138,51 @@ class FarmSliceService(private val store: FarmStore = InMemoryFarmStore()) {
         return farmActivityBreakdown(farm.transactions, farm.trades, farm.settlements)
     }
     fun loadFarm(farmId: String): FarmState? = store.loadFarm(farmId)
+
+    /**
+     * Ensures the farm's products and supplies include the predefined items
+     * for its currently enabled activities. Missing items are added; existing
+     * items are never duplicated or overwritten.
+     *
+     * This retroactively provisions predefined items for farms created before
+     * the auto-provisioning feature, or for farms whose activities were set
+     * before the feature existed. Safe to call repeatedly.
+     */
+    fun ensurePredefinedItems(farmId: String): Boolean {
+        val farm = getFarm(farmId)
+        val newProducts = seedProducts(farm.activities.toSet())
+            .filter { p -> farm.products.none { it.name.equals(p.name, ignoreCase = true) } }
+        val newSupplies = seedSupplies(farm.activities.toSet())
+            .filter { s -> farm.supplies.none { it.name.equals(s.name, ignoreCase = true) } }
+        if (newProducts.isEmpty() && newSupplies.isEmpty()) return false
+        val updated = farm.copy(
+            products = (farm.products + newProducts).toMutableList(),
+            supplies = (farm.supplies + newSupplies).toMutableList()
+        )
+        FarmStateValidator.validateFarm(updated)
+        store.saveFarm(updated)
+        return true
+    }
+
+    private fun seedProducts(activities: Set<FarmActivityType>): List<FarmProduct> =
+        activities.flatMap { FarmActivityCatalog.predefinedProducts(it) }
+            .map { predefined ->
+                FarmProduct(
+                    id = "product-${UUID.randomUUID()}",
+                    name = predefined.name,
+                    defaultUnit = predefined.defaultUnit
+                )
+            }
+
+    private fun seedSupplies(activities: Set<FarmActivityType>): List<FarmSupply> =
+        activities.flatMap { FarmActivityCatalog.predefinedSupplies(it) }
+            .map { predefined ->
+                FarmSupply(
+                    id = "supply-${UUID.randomUUID()}",
+                    name = predefined.name,
+                    unit = predefined.defaultUnit
+                )
+            }
 
     fun currentFarmId(): String? = store.currentFarmId()
 

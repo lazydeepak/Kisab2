@@ -14,6 +14,77 @@ class FarmActivityServiceTest {
     }
 
     @Test
+    fun createFarmAutoProvisionsPredefinedProductsAndSupplies() {
+        val farm = service.createFarm(
+            "Poultry Farm",
+            activities = listOf(FarmActivityType.POULTRY)
+        )
+        // POULTRY predefined: 4 products (Egg, Chicken (Meat), Live Chicken, Manure)
+        // POULTRY predefined: 5 supplies (Chicks, Feed, Medicine, Vaccines, Husk)
+        val productNames = service.products(farm.id).map { it.name }
+        val supplyNames = service.supplies(farm.id).map { it.name }
+        assertEquals(4, productNames.size)
+        assertTrue(productNames.contains("Egg"))
+        assertTrue(productNames.contains("Manure"))
+        assertEquals(5, supplyNames.size)
+        assertTrue(supplyNames.contains("Feed"))
+        assertTrue(supplyNames.contains("Chicks"))
+    }
+
+    @Test
+    fun setFarmActivitiesAutoProvisionsNewActivityItems() {
+        val farm = service.createFarm("Empty Farm")
+        assertEquals(0, service.products(farm.id).size)
+        assertEquals(0, service.supplies(farm.id).size)
+
+        service.setFarmActivities(farm.id, setOf(FarmActivityType.CROPS))
+        val productNames = service.products(farm.id).map { it.name }
+        val supplyNames = service.supplies(farm.id).map { it.name }
+        // CROPS predefined: 9 products, 6 supplies
+        assertEquals(9, productNames.size)
+        assertTrue(productNames.contains("Paddy"))
+        assertEquals(6, supplyNames.size)
+        assertTrue(supplyNames.contains("Urea"))
+    }
+
+    @Test
+    fun ensurePredefinedItemsIsIdempotent() {
+        val farm = service.createFarm(
+            "Dairy Farm",
+            activities = listOf(FarmActivityType.CATTLE_BUFFALO_DAIRY)
+        )
+        val countBefore = service.products(farm.id).size
+        // Calling again should add nothing
+        val added = service.ensurePredefinedItems(farm.id)
+        assertEquals(false, added)
+        assertEquals(countBefore, service.products(farm.id).size)
+    }
+
+    @Test
+    fun ensurePredefinedItemsRetroactivelyProvisionsExistingFarm() {
+        // Simulate a legacy farm: activities but no predefined products/supplies
+        val store = InMemoryFarmStore()
+        val service = FarmSliceService(store)
+        val farm = FarmState(
+            id = "farm-legacy",
+            name = "Legacy Farm",
+            currencyCode = "NPR",
+            activities = mutableListOf(FarmActivityType.POULTRY, FarmActivityType.CROPS)
+        )
+        store.saveFarm(farm)
+        store.setCurrentFarmId(farm.id)
+
+        val added = service.ensurePredefinedItems(farm.id)
+        assertTrue(added)
+        val productNames = service.products(farm.id).map { it.name }
+        val supplyNames = service.supplies(farm.id).map { it.name }
+        assertTrue(productNames.contains("Egg"))
+        assertTrue(productNames.contains("Paddy"))
+        assertTrue(supplyNames.contains("Feed"))
+        assertTrue(supplyNames.contains("Urea"))
+    }
+
+    @Test
     fun createFarmOrdersActivitiesByDisplayOrder() {
         val farm = service.createFarm(
             "Mixed",

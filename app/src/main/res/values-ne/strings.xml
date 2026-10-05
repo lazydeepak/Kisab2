@@ -311,8 +311,8 @@
     <string name="today_expenses_label">खर्च</string>
     <string name="today_credit_sales_label">उधार बिक्री</string>
     <string name="today_money_attention_title">पैसाको अवस्था (खाता)</string>
-    <string name="today_receivable_label">लिन बाँकी (ग्राहकबाट)</string>
-    <string name="today_payable_label">तिर्न बाँकी (आपूर्तिकर्तालाई)</string>
+    <string name="today_receivable_label">लिन बाँकी</string>
+    <string name="today_payable_label">तिर्न बाँकी</string>
     <string name="today_view_khata_action">खाता हेर्नुहोस्</string>
     <string name="today_khata_settled">सबै हिसाब चुक्ता छ (लिन वा तिर्न बाँकी केही छैन)।</string>
     <string name="today_farm_status_title">फार्मको स्थिति</string>
@@ -372,7 +372,7 @@
     <string name="settings_action">सेटिङहरू</string>
 
     <string name="parties_section">पार्टीहरू</string>
-    <string name="parties_empty">अहिलेसम्म कुनै पार्टी छैन। तपाईंले व्यवहार गर्ने व्यक्ति र व्यवसायहरू थप्नुहोस्।</string>
+    <string name="parties_empty">अहिलेसम्म कुनै पार्टी छैन।</string>
     <string name="add_party_action">पार्टी थप्नुहोस्</string>
     <string name="khata_search_hint">नाम वा फोन नम्बर खोज्नुहोस्…</string>
     <string name="khata_filter_all">सबै</string>
@@ -515,9 +515,9 @@
     <string name="overview_receivable_format">प्राप्त गर्न बाँकी: %1$s</string>
     <string name="overview_payable_format">तिर्न बाँकी: %1$s</string>
     <string name="overview_position_as_of_format">सम्मको स्थिति: %1$s</string>
-    <string name="overview_cash_empty">यस अवधिमा कुनै नगद आम्दानी वा खर्च छैन।</string>
-    <string name="overview_trade_empty">यस अवधिमा कुनै बिक्री, खरिद वा भुक्तानी छैन।</string>
-    <string name="overview_position_empty">यस अवधिको अन्त्यमा प्राप्त गर्नुपर्ने वा तिर्नुपर्ने कुनै रकम छैन।</string>
+    <string name="overview_cash_empty">कुनै नगद आम्दानी वा खर्च छैन।</string>
+    <string name="overview_trade_empty">अहिलेसम्म कुनै बिक्री वा खरिद छैन।</string>
+    <string name="overview_position_empty">कुनै बकाया रकम छैन।</string>
     <string name="overview_trend_empty">यस अवधिमा अहिलेसम्म कुनै मासिक कारोबार छैन।</string>
     <string name="trend_row_format">%1$s | आम्दानी %2$s | खर्च %3$s | बिक्री %4$s | खरिद %5$s | प्राप्त %6$s | गरिएको %7$s</string>
 

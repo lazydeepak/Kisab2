@@ -316,8 +316,8 @@ Unexplained: %4$s %5$s</string>
     <string name="today_expenses_label">Expenses</string>
     <string name="today_credit_sales_label">Credit sales</string>
     <string name="today_money_attention_title">Money needing attention</string>
-    <string name="today_receivable_label">To receive (customers)</string>
-    <string name="today_payable_label">To pay (suppliers)</string>
+    <string name="today_receivable_label">To receive</string>
+    <string name="today_payable_label">To pay</string>
     <string name="today_view_khata_action">View Khata</string>
     <string name="today_khata_settled">All accounts settled (nothing owed or owing).</string>
     <string name="today_farm_status_title">Farm status</string>
@@ -377,7 +377,7 @@ Unexplained: %4$s %5$s</string>
     <string name="settings_action">Settings</string>
 
     <string name="parties_section">Parties</string>
-    <string name="parties_empty">No parties yet. Add the people and businesses you deal with.</string>
+    <string name="parties_empty">No parties yet</string>
     <string name="add_party_action">Add party</string>
     <string name="khata_search_hint">Search by name or phone…</string>
     <string name="khata_filter_all">All</string>
@@ -520,9 +520,9 @@ Unexplained: %4$s %5$s</string>
     <string name="overview_receivable_format">Receivable: %1$s</string>
     <string name="overview_payable_format">Payable: %1$s</string>
     <string name="overview_position_as_of_format">As of: %1$s</string>
-    <string name="overview_cash_empty">No cash income or expenses in this period.</string>
-    <string name="overview_trade_empty">No sales, purchases, or payments in this period.</string>
-    <string name="overview_position_empty">No money owed or owing at the end of this period.</string>
+    <string name="overview_cash_empty">No cash activity.</string>
+    <string name="overview_trade_empty">No sales or purchases yet.</string>
+    <string name="overview_position_empty">No outstanding balances.</string>
     <string name="overview_trend_empty">No monthly activity in this period yet.</string>
     <string name="trend_row_format">%1$s | in %2$s | out %3$s | sales %4$s | purchases %5$s | received %6$s | paid %7$s</string>
 

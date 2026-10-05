@@ -276,7 +276,7 @@ class FarmActivityPersistenceTest {
         service.addParty(farm.id, com.susankhya.kisab.domain.PartyDraft(name = "Ram", role = com.susankhya.kisab.domain.PartyRole.CUSTOMER))
         service.addProduct(farm.id, "Eggs", com.susankhya.kisab.domain.ProductUnit.PIECE)
         service.addProductSale(
-            farm.id, service.parties(farm.id).single().id, service.products(farm.id).single().id,
+            farm.id, service.parties(farm.id).single().id, service.products(farm.id).first { it.name == "Eggs" }.id,
             quantity = BigDecimal("10"), rateMinor = 500,
             initialPaymentMinor = 2000, occurredAt = "2024-06-01T12:00:00Z",
             activity = FarmActivityType.POULTRY
@@ -436,10 +436,10 @@ class FarmActivityPersistenceTest {
             activities = listOf(FarmActivityType.POULTRY)
         )
         service.addParty(farm.id, com.susankhya.kisab.domain.PartyDraft(name = "Sita", role = com.susankhya.kisab.domain.PartyRole.SUPPLIER))
-        service.addSupply(farm.id, "Feed", com.susankhya.kisab.domain.ProductUnit.KILOGRAM)
+        // "Feed" is auto-provisioned by FarmActivityCatalog.predefinedSupplies(POULTRY)
         service.addSupplierPurchase(
-            farm.id, service.parties(farm.id).single().id, service.supplies(farm.id).single().id,
-            quantity = BigDecimal("10"), unit = com.susankhya.kisab.domain.ProductUnit.KILOGRAM,
+            farm.id, service.parties(farm.id).single().id, service.supplies(farm.id).first { it.name == "Feed" }.id,
+            quantity = BigDecimal("10"), unit = com.susankhya.kisab.domain.ProductUnit.BAG,
             amountMinor = 3000, initialPaymentMinor = 1000,
             occurredAt = "2024-06-20T12:00:00Z", description = "Feed",
             activity = FarmActivityType.POULTRY

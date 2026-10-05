@@ -338,17 +338,14 @@ class FarmActivity : AppCompatActivity() {
     private lateinit var overviewCashIncomeText: TextView
     private lateinit var overviewCashExpenseText: TextView
     private lateinit var overviewCashNetText: TextView
-    private lateinit var overviewCashEmptyText: TextView
     private lateinit var overviewSalesText: TextView
     private lateinit var overviewPurchasesText: TextView
     private lateinit var overviewPaymentsReceivedText: TextView
     private lateinit var overviewPaymentsMadeText: TextView
-    private lateinit var overviewTradeEmptyText: TextView
     private lateinit var overviewPositionAsOfText: TextView
     private lateinit var overviewReceivableText: TextView
     private lateinit var overviewPayableText: TextView
     private lateinit var overviewNetPositionText: TextView
-    private lateinit var overviewPositionEmptyText: TextView
     private lateinit var overviewTrendEmptyText: TextView
     private lateinit var overviewTrendContainer: LinearLayout
     private var overviewPeriodPreset: FinancialPeriodPreset = FinancialPeriodPreset.THIS_MONTH
@@ -1255,17 +1252,14 @@ class FarmActivity : AppCompatActivity() {
         overviewCashIncomeText = findViewById(R.id.overviewCashIncomeText)
         overviewCashExpenseText = findViewById(R.id.overviewCashExpenseText)
         overviewCashNetText = findViewById(R.id.overviewCashNetText)
-        overviewCashEmptyText = findViewById(R.id.overviewCashEmptyText)
         overviewSalesText = findViewById(R.id.overviewSalesText)
         overviewPurchasesText = findViewById(R.id.overviewPurchasesText)
         overviewPaymentsReceivedText = findViewById(R.id.overviewPaymentsReceivedText)
         overviewPaymentsMadeText = findViewById(R.id.overviewPaymentsMadeText)
-        overviewTradeEmptyText = findViewById(R.id.overviewTradeEmptyText)
         overviewPositionAsOfText = findViewById(R.id.overviewPositionAsOfText)
         overviewReceivableText = findViewById(R.id.overviewReceivableText)
         overviewPayableText = findViewById(R.id.overviewPayableText)
         overviewNetPositionText = findViewById(R.id.overviewNetPositionText)
-        overviewPositionEmptyText = findViewById(R.id.overviewPositionEmptyText)
         overviewTrendEmptyText = findViewById(R.id.overviewTrendEmptyText)
         overviewTrendContainer = findViewById(R.id.overviewTrendContainer)
 
@@ -2243,6 +2237,7 @@ class FarmActivity : AppCompatActivity() {
         if (khataPartyId != null) {
             refreshKhataView()
         } else {
+            currentFarmId?.let { service.ensurePredefinedItems(it) }
             updateHisabKitabChromeVisibility(false)
             renderHisabSummary()
             renderFinancialOverview()
@@ -2298,7 +2293,6 @@ class FarmActivity : AppCompatActivity() {
         overviewCashIncomeText.visibility = if (hasCash) View.VISIBLE else View.GONE
         overviewCashExpenseText.visibility = if (hasCash) View.VISIBLE else View.GONE
         overviewCashNetText.visibility = if (hasCash) View.VISIBLE else View.GONE
-        overviewCashEmptyText.visibility = if (hasCash) View.GONE else View.VISIBLE
 
         overviewSalesText.text = string(R.string.overview_sales_format, formatMoney(currency, trade.grossSalesMinor))
         overviewPurchasesText.text = string(R.string.overview_purchases_format, formatMoney(currency, trade.grossPurchasesMinor))
@@ -2310,7 +2304,6 @@ class FarmActivity : AppCompatActivity() {
         overviewPurchasesText.visibility = if (hasTrade) View.VISIBLE else View.GONE
         overviewPaymentsReceivedText.visibility = if (hasTrade) View.VISIBLE else View.GONE
         overviewPaymentsMadeText.visibility = if (hasTrade) View.VISIBLE else View.GONE
-        overviewTradeEmptyText.visibility = if (hasTrade) View.GONE else View.VISIBLE
 
         // The position counts facts strictly before endExclusive; show the last
         // *included* instant so "As of" never presents the excluded boundary as
@@ -2333,7 +2326,6 @@ class FarmActivity : AppCompatActivity() {
         overviewReceivableText.visibility = if (hasPosition) View.VISIBLE else View.GONE
         overviewPayableText.visibility = if (hasPosition) View.VISIBLE else View.GONE
         overviewNetPositionText.visibility = if (hasPosition) View.VISIBLE else View.GONE
-        overviewPositionEmptyText.visibility = if (hasPosition) View.GONE else View.VISIBLE
 
         overviewTrendContainer.removeAllViews()
         val rows = overview.monthlyTrend
@@ -2362,6 +2354,7 @@ class FarmActivity : AppCompatActivity() {
 
     private fun renderTrades() {
         val farmId = currentFarmId ?: run {
+            tradesSectionLabel.visibility = View.GONE
             tradesEmptyText.visibility = View.VISIBLE
             tradesContainer.removeAllViews()
             return
@@ -2370,6 +2363,7 @@ class FarmActivity : AppCompatActivity() {
         val currency = farm?.currencyCode ?: FarmState.DEFAULT_CURRENCY_CODE
         val trades = service.trades(farmId)
         val settlements = farm?.settlements.orEmpty()
+        tradesSectionLabel.visibility = if (trades.isEmpty()) View.GONE else View.VISIBLE
         tradesEmptyText.visibility = if (trades.isEmpty()) View.VISIBLE else View.GONE
         tradesContainer.removeAllViews()
         if (trades.isEmpty()) return
